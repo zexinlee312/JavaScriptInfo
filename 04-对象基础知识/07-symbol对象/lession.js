@@ -1,4 +1,4 @@
-// 两种原始类型可以作为obj的value：string和symbol
+// 两种原始类型可以作为obj的键：string和symbol
 let one = Symbol();
 let objOne = {
   one: one,
