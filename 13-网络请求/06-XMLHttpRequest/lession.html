@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XMLHttpRequest</title>
+  </head>
+  <script src="./lession.js"></script>
+  <body>
+    <button id="downloadBtn">下载</button>
+    <form id="uploadForm" name="uploadForm">
+      姓名：<input type="text" name="name" /> 年龄：<input
+        type="number"
+        name="age"
+      />
+      <button id="submit" type="submit">提交</button>
+    </form>
+  </body>
+  <script>
+    document
+      .getElementById('downloadBtn')
+      .addEventListener('click', function () {
+        console.log('click download');
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'http://localhost:3000/download', true);
+        xhr.responseType = 'blob';
+
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            const url = window.URL.createObjectURL(xhr.response);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'example.txt'; // 替换为你的文件名
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+          }
+        };
+        xhr.onprogress = function (event) {
+          if (event.lengthComputable) {
+            alert(`Received ${event.loaded} of ${event.total} bytes`);
+          } else {
+            alert(`Received ${event.loaded} bytes`); // 没有 Content-Length
+          }
+        };
+
+        xhr.send();
+      });
+    document.getElementById('submit').addEventListener('click', (event) => {
+      event.preventDefault();
+      console.log('submit');
+      let formData = new FormData(document.forms.uploadForm);
+      formData.append('sex', 'man');
+      console.log(formData);
+      let jsonObject = {};
+      formData.forEach((value, key) => {
+        jsonObject[key] = value;
+      });
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://localhost:3000/uploadForm', true);
+      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+      xhr.send(JSON.stringify(jsonObject));
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          console.log(xhr.responseText);
+        }
+      };
+    });
+  </script>
+</html>
